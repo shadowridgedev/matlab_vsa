@@ -3,7 +3,7 @@
 clear all;
 close all;
 
-[input,Fs] = audioread('recordings/1.wav');
+[input,Fs] = audioread('normal/1.wav');
 
 [gci, goi] = dypsa(input, Fs);
 

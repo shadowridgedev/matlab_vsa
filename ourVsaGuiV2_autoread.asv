@@ -152,7 +152,7 @@ function plotImpulseDiffs(handle,impulseCTtimeInstances,firstDifference)
 
     
     
-function jitPercentage = processAndPlot(file,handleSegmented,handleOverlay,handleImpluses,handleBoxplot,handleTextJitter)
+function jitPercentage = processAndPlot(file,handleSegmented,handleOverlay,handleImpluses,handleBoxplot)
     [input,Fs] = audioread(file);
 
     [input,avg] = prepareInputSignal(input,Fs);
@@ -173,16 +173,12 @@ function jitPercentage = processAndPlot(file,handleSegmented,handleOverlay,handl
     boxplot(firstDifference);
     
     jitPercentage = myJitter(firstDifference);
-    
-    set(handleTextJitter, 'String', [num2str(round(jitPercentage,2)) '%']);
- 
 
-    
     
     
 function jitNorm = processNormal(hObject, eventdata, handles, file)
     
-    jitNorm = processAndPlot(file,handles.panelSegmentedNormal,handles.panelSegmentedOverlayNormal,handles.panelImpulseNormal,handles.panelNormalBoxplot, handles.textJitterNormal);
+    jitNorm = processAndPlot(file,handles.panelSegmentedNormal,handles.panelSegmentedOverlayNormal,handles.panelImpulseNormal,handles.panelNormalBoxplot);
       
 function jit = myJitter(firstDiff)
     firstDiff = firstDiff ./ max(firstDiff);
@@ -198,8 +194,12 @@ function jit = jitter(firstDiff)
     secDiffSum = sum(secondDiff);
     
     jit = abs(((secDiffSum/(N-1))/(firstDifSum/N)))*100; %relative jitter
+   
+function displayJitter(){
+	set(handleJitText, 'String', [num2str(round(jit,2)) '%']);
+}
     
-function processAndPlotLoop(hObject,eventdata,handles,mode,handleTable,files,path,handleJitBoxplot,handleMeanJit)
+function processAndPlotLoop(hObject,eventdata,handles,mode,handleTable,files,path,handleJitText,handleJitBoxplot,handleMeanJit)
 	set(handleTable, 'Data', {});
 
     jits = zeros(1,length(files));
@@ -216,7 +216,7 @@ function processAndPlotLoop(hObject,eventdata,handles,mode,handleTable,files,pat
             
         jits(n) = jit;
 
-        %set(handleJitText, 'String', [num2str(round(jit,2)) '%']);
+        set(handleJitText, 'String', [num2str(round(jit,2)) '%']);
 
         data=get(handleTable, 'data');
         %data(end+1,:)={[word ' ' num2str(round(jit,2))]}; %if data is a cell or 
@@ -325,7 +325,7 @@ end
     
 function jitStr = processStressed(hObject, eventdata, handles, file)
 
-	jitStr = processAndPlot(file,handles.panelSegmentedStressed,handles.panelSegmentedOverlayStressed,handles.panelImpulseStressed,handles.panelStressedBoxplot,handles.textJitterStressed);
+	jitStr = processAndPlot(file,handles.panelSegmentedStressed,handles.panelSegmentedOverlayStressed,handles.panelImpulseStressed,handles.panelStressedBoxplot);
 
     
     
@@ -342,7 +342,7 @@ files = {files.name};
 [filpath,name,ext] = fileparts(folder_name);
 audios_name = strcat(name,'/');
 
-processAndPlotLoop(hObject,eventdata,handles,'normal',handles.uitableJitNorm,files,audios_name,handles.uipanelJitBoxplotNormal,handles.textMeanJitNormal);
+processAndPlotLoop(hObject,eventdata,handles,'normal',handles.uitableJitNorm,files,audios_name,handles.textJitterNormal,handles.uipanelJitBoxplotNormal,handles.textMeanJitNormal);
 
        
 
@@ -360,7 +360,7 @@ files = {files.name};
 [filpath,name,ext] = fileparts(folder_name);
 audios_name = strcat(name,'/');
 
-processAndPlotLoop(hObject,eventdata,handles,'stressed',handles.uitableStressed,files,audios_name,handles.uipanelJitBoxplotStressed,handles.textMeanJitStressed);
+processAndPlotLoop(hObject,eventdata,handles,'stressed',handles.uitableStressed,files,audios_name,handles.textJitterStressed,handles.uipanelJitBoxplotStressed,handles.textMeanJitStressed);
 
 
 

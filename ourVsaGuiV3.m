@@ -22,7 +22,7 @@ function varargout = ourVsaGuiV3(varargin)
 
 % Edit the above text to modify the response to help ourVsaGuiV3
 
-% Last Modified by GUIDE v2.5 17-Nov-2017 05:06:44
+% Last Modified by GUIDE v2.5 19-Nov-2017 13:31:36
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -102,7 +102,6 @@ function plotSegmentedSignal(handle,input,avg,impulseCT,impulseOT)
     cla(psnxAx1);
     plot(input),axis('tight');
     hold on;
-    plot(avg);
     set(gca,'Yticklabel',[]) 
     set(gca,'Xticklabel',[]) 
     axes(psnxAx2);
@@ -206,6 +205,9 @@ function pushbuttonRecAud_Callback(hObject, eventdata, handles)
     Fs = sampleRate; 
     input = y(:,1);
     
+    setappdata(0,'recAudioInput',input);
+    setappdata(0,'recAudioFs',Fs);
+    
     sound(y,Fs);
     
 	jit = processNormal(hObject, eventdata, handles, input,Fs); 
@@ -296,3 +298,13 @@ function pushbuttonDypsaTestbed_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 run(ourVsaGuiV2_autoread)
+
+
+% --- Executes on button press in pushbuttonPlayRec.
+function pushbuttonPlayRec_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbuttonPlayRec (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+[input] = getappdata(0,'recAudioInput');
+Fs = getappdata(0,'recAudioFs');
+sound(input,Fs);
