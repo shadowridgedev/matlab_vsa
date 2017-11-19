@@ -22,7 +22,7 @@ function varargout = fourier_analysis_gui(varargin)
 
 % Edit the above text to modify the response to help fourier_analysis_gui
 
-% Last Modified by GUIDE v2.5 17-Nov-2017 04:03:17
+% Last Modified by GUIDE v2.5 17-Nov-2017 01:09:08
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -60,6 +60,7 @@ guidata(hObject, handles);
 
 % UIWAIT makes fourier_analysis_gui wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
+
 clc;
 
 evalin( 'base', 'clear variables' );
@@ -67,60 +68,45 @@ cla(handles.voice_signal_axis,'reset');
 cla(handles.fourier_axis,'reset');
 set(handles.array1, 'Data', cell(size(get(handles.array1,'Data'))));
 set(handles.array2, 'Data', cell(size(get(handles.array2,'Data'))));
-
 set(handles.meanFo1,'String','');
 set(handles.meanFo2,'String','');
 set(handles.Fo,'String','');
 
 fo = getappdata(0,'evalue1');
 fs = getappdata(0,'evalue2');
-%assignin('base', 'fo', fo);
-%assignin('base', 'temp', temp);
-
-
-mean_sfo = getappdata(0,'evalue3');
-mean_nfo = getappdata(0,'evalue4');
+mean_nfo = getappdata(0,'evalue3');
+mean_sfo = getappdata(0,'evalue4');
 y = getappdata(0,'evalue5');
-temp = getappdata(0,'evalue6'); 
-female_check = getappdata(0,'evalue7'); 
-male_check = getappdata(0,'evalue8'); 
+temp = getappdata(0,'evalue6');
+male_check = getappdata(0,'evalue7');
+female_check = getappdata(0,'evalue8');
+normal_fos = getappdata(0,'evalue9');
+stressed_fos = getappdata(0,'evalue10');
 
-%assignin('base', 'mean_sfo', mean_sfo);
-%assignin('base', 'mean_nfo', mean_nfo);
+assignin('base', 'temp', temp);
+assignin('base', 'fo', fo);
+assignin('base', 'fs', fs);
+assignin('base', 'y', y);
+assignin('base', 'mean_sfo', mean_sfo);
+assignin('base', 'mean_nfo', mean_nfo);
+assignin('base', 'normal_fos', normal_fos);
+assignin('base', 'stressed_fos', stressed_fos);
 
-if male_check == 1 && female_check == 0
-    Stressed_Male_fos = dlmread ('StressedMale_fos.m'); 
-    Normal_Male_fos = dlmread ('NormalMale_fos.m'); 
-    assignin('base', 'Stressed_Male_fos', Stressed_Male_fos);
-    assignin('base', 'Normal_Male_fos', Normal_Male_fos);
-
-    set(handles.array1,'Data', Stressed_Male_fos,'ColumnName',{'Stressed Males'},'RowName',{'BREAK','CHANGE','DEGREE','DESTINATION','EAST','EIGHT','EIGHTY','ENTER','FIFTY','FIX'});
-    set(handles.array2, 'Data', Normal_Male_fos,'ColumnName',{'Non-Stressed Males'},'RowName',{'BREAK','CHANGE','DEGREE','DESTINATION','EAST','EIGHT','EIGHTY','ENTER','FIFTY','FIX'});
-
-elseif male_check == 0 && female_check == 1
-    Stressed_Female_fos = dlmread ('StressedFemale_fos.m'); 
-    Normal_Female_fos = dlmread ('NormalFemale_fos.m'); 
-    assignin('base', 'Stressed_Female_fos', Stressed_Female_fos);
-    assignin('base', 'Normal_Female_fos', Normal_Female_fos);
-
-    set(handles.array1,'Data', Stressed_Female_fos,'ColumnName',{'Stressed Females'},'RowName',{'BREAK','CHANGE','DEGREE','DESTINATION','EAST','EIGHT','EIGHTY','ENTER','FIFTY','FIX'});
-    set(handles.array2, 'Data', Normal_Female_fos,'ColumnName',{'Non-Stressed Females'},'RowName',{'BREAK','CHANGE','DEGREE','DESTINATION','EAST','EIGHT','EIGHTY','ENTER','FIFTY','FIX'});
+if male_check == 1 && female_check ==0 
+    set(handles.array1,'Data', stressed_fos,'ColumnName',{'Stressed Males'},'RowName',{'BREAK','CHANGE','DEGREE','DESTINATION','EAST','EIGHT','EIGHTY','ENTER','FIFTY','FIX'});
+    set(handles.array2, 'Data', normal_fos,'ColumnName',{'Non-Stressed Males'},'RowName',{'BREAK','CHANGE','DEGREE','DESTINATION','EAST','EIGHT','EIGHTY','ENTER','FIFTY','FIX'});
+elseif male_check == 0 && female_check == 1 
+    set(handles.array1,'Data', stressed_fos,'ColumnName',{'Stressed Females'},'RowName',{'BREAK','CHANGE','DEGREE','DESTINATION','EAST','EIGHT','EIGHTY','ENTER','FIFTY','FIX'});
+    set(handles.array2, 'Data', normal_fos,'ColumnName',{'Non-Stressed Females'},'RowName',{'BREAK','CHANGE','DEGREE','DESTINATION','EAST','EIGHT','EIGHTY','ENTER','FIFTY','FIX'});
 end
-
-
-
-mean_sfo_str = strcat(num2str(mean_sfo),' HZ');
-set(handles.meanFo1, 'String', mean_sfo_str); 
-mean_nfo_str = strcat(num2str(mean_nfo),' HZ');
-set(handles.meanFo2, 'String', mean_nfo_str);
-
-
 
 TotalTime = length(y)./fs;
 t = 0:TotalTime/(length(y)):TotalTime-TotalTime/length(y);
 
 axes(handles.voice_signal_axis);
 plot(t,y);
+grid;
+xlabel('Time (s)');
 
 ydft = fft(y);
 freq = 0:fs/length(y):fs/2;
@@ -128,14 +114,21 @@ ydft = ydft(1:length(y)/2+1);
 
 axes(handles.fourier_axis);
 plot(freq,abs(ydft));
+grid;
+xlabel('Frequency (HZ)');
 xlim([0 1000]);
 
-[maxval,idx] = max(abs(ydft));
-fo = freq(idx);
-assignin('base', 'fo',fo);
+mean_sfo_str = strcat(num2str(round(mean_sfo)),' HZ');
+set(handles.meanFo1, 'String', mean_sfo_str); 
+ 
+mean_nfo_str = strcat(num2str(round(mean_nfo)),' HZ');
+set(handles.meanFo2, 'String', mean_nfo_str);
 
-String_Fo = strcat(num2str(round(freq(idx))),' HZ');
+String_Fo = strcat(num2str(round(fo)),' HZ');
 set(handles.Fo, 'String', String_Fo);
+
+temp_str = strcat(num2str(round(temp)),' HZ');
+set(handles.fth, 'String', temp_str);
 
 
 % --- Outputs from this function are returned to the command line.
@@ -178,15 +171,15 @@ function female_check_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of female_check
 
 
-% --- Executes on button press in pushButtonMainMenu.
-function pushButtonMainMenu_Callback(hObject, eventdata, handles)
-% hObject    handle to pushButtonMainMenu (see GCBO)
+% --- Executes on button press in next_window.
+function next_window_Callback(hObject, eventdata, handles)
+% hObject    handle to next_window (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 
 close(fourier_analysis_gui);
-run (main_gui);
+run (ourVsaGuiV2);
 
 
 % --- Executes on button press in get_data.

@@ -3,7 +3,10 @@ clc;
 
 a = 1;
 input = 2;
-[out1, out2] = VSAv1('abc')
+% [out1, out2] = VSAv1('abc')
+[input, fs] = audioread('recordings/numbers_02-1_norm.wav')
+input = input(:,1);
+[voice ,avg] = signal_preprocess(input,fs);
 
 
 % filename = 'voice.wav';

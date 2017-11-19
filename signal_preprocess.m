@@ -33,23 +33,60 @@ function [output1, output2] = signal_preprocess(input, fs, window_length)
     %Find windowed average
     
     
-    avg = window_average(signal, fs, window_size);
-    avg = window_average(avg, fs, window_size);
+    avg = median_filter(signal, fs, window_size);
+    avg = median_filter(avg, fs, window_size);
     
     avg_max = max(avg);
     
     voice = zeros(len,1);
     threshold = avg_max*percentage;
-
-    for n = 1:len
-        if avg(n) >= threshold
-            voice(n) = 1;
+    %on_off column 1 holds on transition while column 2 holds off trans.
+    index = 1;
+    for current = 1:len
+        if avg(current) >= threshold
+            voice(current) = 1;
+        end
+        %check only if current index is larger than 1
+        if current > 1
+            %if current is 1 and previous is 0 (on)
+            if voice(current) > voice(previous)
+                on_off(index,1) = current;
+            %if current is 0 and previous is 1 (on)
+            elseif voice(previous) > voice(current)
+                on_off(index,2) = current;
+                %increment index when 'off' is found
+                index = index + 1;
+            end
+        %if current = 1, initialize previous to 1
+        else
+            previous = 1;
+        end
+        previous = current;
+    end
+    %Check if first and last element(1st column) is omplete
+    if on_off(1,1) == 0
+        %Reassign to first element
+        on_off(1,1) = 1;
+    end
+    %Check if final element(2nd column) is complete
+    if (index == length(on_off(:,1)))
+        if on_off(index,2)== 0
+            on_off(index, 2) = len;
         end
     end
-    voice = on_off(voice);
+    vector = diff(on_off, 1,2);
+    [vector_max, vector_index] = max(vector)
+    on_off = on_off(vector_index, :);
+    %Create mask
+    mask(1:on_off(1,1)-1) = 0;
+    mask(on_off(1,1):on_off(1,2)) = 1;
+    mask(on_off(1,2)+1:len) = 0;
+    %Set output1
+    output1 =  voice .* mask';
+    %Set output2 
     avg = avg ./ max(avg);   
-    output1 = voice;
     output2 = avg;
+    
     
     
     
