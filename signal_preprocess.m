@@ -29,18 +29,21 @@ function [output1, output2] = signal_preprocess(input, fs, window_length)
     %Voice-Unvoice vector: 
         %1 for voice
         %0 for unvoice
-
     %Find windowed average
-    
-    
     avg = median_filter(signal, fs, window_size);
     avg = median_filter(avg, fs, window_size);
-    
+    %Find max value
     avg_max = max(avg);
-    
+    %Pre-allocate voice array for speed
     voice = zeros(len,1);
+    %Calculate threshold
     threshold = avg_max*percentage;
-    %on_off column 1 holds on transition while column 2 holds off trans.
+    %Set 0 or 1 if below or above threshold respectively. Additionally,
+    %find the on-off states of the voice-unvoice pair. This is later used
+    %to find the 'longest' voice within the current buffer(or file) and
+    %analyze it:
+        %on_off column 1 holds on transition while column 2 holds off
+        %transition
     index = 1;
     for current = 1:len
         if avg(current) >= threshold
@@ -75,7 +78,7 @@ function [output1, output2] = signal_preprocess(input, fs, window_length)
         end
     end
     vector = diff(on_off, 1,2);
-    [vector_max, vector_index] = max(vector)
+    [vector_max, vector_index] = max(vector);
     on_off = on_off(vector_index, :);
     %Create mask
     mask(1:on_off(1,1)-1) = 0;

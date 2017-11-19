@@ -1,14 +1,41 @@
 clear all;
 clc;
 
-a = 1;
-input = 2;
+
+
 % [out1, out2] = VSAv1('abc')
-[input, fs] = audioread('recordings/numbers_02-1_norm.wav')
+[input, fs] = audioread('recordings/numbers_04-1_norm.wav');
 input = input(:,1);
 [voice ,avg] = signal_preprocess(input,fs);
+input = input .* voice;
+input(input==0) = [];
+input = input ./ max(abs(input));
+corr = lpcauto(input);
+ydft = fft(input);
+ydft = ydft ./ max(abs(ydft));
+freq = 0:fs/length(input):fs/2;
+ydft = ydft(1:floor(length(input)/2)+1);
+figure();
+freq(freq > 700) = [];
+subplot(211),plot(freq, abs(ydft(1:length(freq)))),subplot(212),plot(corr);
+sum(abs(corr))/length(corr)
 
-
+% [out1, out2] = VSAv1('abc')
+[input, fs] = audioread('recordings/numbers_04-1_stress.wav');
+input = input(:,1);
+[voice ,avg] = signal_preprocess(input,fs);
+input = input .* voice;
+input(input==0) = [];
+input = input ./ max(abs(input));
+corr = lpcauto(input);
+ydft = fft(input);
+ydft = ydft ./ max(abs(ydft));
+freq = 0:fs/length(input):fs/2;
+ydft = ydft(1:floor(length(input)/2)+1);
+figure();
+freq(freq > 700) = [];
+subplot(211),plot(freq, abs(ydft(1:length(freq)))),subplot(212), plot(corr);
+sum(abs(corr))/length(corr)
 % filename = 'voice.wav';
 % 
 % recObj = audiorecorder;

@@ -145,7 +145,7 @@ while empty == 1
         assignin('base', 'mean_nfo', mean_nfo);
 
     else
-        e = msgbox('Please type MALE or FEMALE in the textbox before pressing the record buttton', 'Error','error');
+        msgbox('Please check MALE or FEMALE before recording', 'Error','error');
         return;
     end
 end
