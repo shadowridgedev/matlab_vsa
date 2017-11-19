@@ -226,7 +226,7 @@ function processAndPlotLoop(hObject,eventdata,handles,mode,handleTable,files,pat
         
         set(handleTable, 'data', data,'ColumnWidth',{200});
 
-        pause(0.02);
+        %pause(0.02);
     end
 
         pjbnAx1 = subplot(1,1,1,'Parent', handleJitBoxplot);
