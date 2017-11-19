@@ -46,7 +46,7 @@ function [output1, output2] = signal_preprocess(input, fs, window_length)
             voice(n) = 1;
         end
     end
-        
+    avg = avg ./ max(avg);   
     output1 = voice;
     output2 = avg;
     

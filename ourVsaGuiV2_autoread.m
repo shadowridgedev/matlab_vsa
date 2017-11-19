@@ -1,35 +1,35 @@
-function varargout = ourVsaGuiV3(varargin)
-% OURVSAGUIV3 MATLAB code for ourVsaGuiV3.fig
-%      OURVSAGUIV3, by itself, creates a new OURVSAGUIV3 or raises the existing
+function varargout = ourVsaGuiV2_autoread(varargin)
+% OURVSAGUIV2_AUTOREAD MATLAB code for ourVsaGuiV2_autoread.fig
+%      OURVSAGUIV2_AUTOREAD, by itself, creates a new OURVSAGUIV2_AUTOREAD or raises the existing
 %      singleton*.
 %
-%      H = OURVSAGUIV3 returns the handle to a new OURVSAGUIV3 or the handle to
+%      H = OURVSAGUIV2_AUTOREAD returns the handle to a new OURVSAGUIV2_AUTOREAD or the handle to
 %      the existing singleton*.
 %
-%      OURVSAGUIV3('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in OURVSAGUIV3.M with the given input arguments.
+%      OURVSAGUIV2_AUTOREAD('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in OURVSAGUIV2_AUTOREAD.M with the given input arguments.
 %
-%      OURVSAGUIV3('Property','Value',...) creates a new OURVSAGUIV3 or raises the
+%      OURVSAGUIV2_AUTOREAD('Property','Value',...) creates a new OURVSAGUIV2_AUTOREAD or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before ourVsaGuiV3_OpeningFcn gets called.  An
+%      applied to the GUI before ourVsaGuiV2_autoread_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to ourVsaGuiV3_OpeningFcn via varargin.
+%      stop.  All inputs are passed to ourVsaGuiV2_autoread_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help ourVsaGuiV3
+% Edit the above text to modify the response to help ourVsaGuiV2_autoread
 
-% Last Modified by GUIDE v2.5 17-Nov-2017 05:06:44
+% Last Modified by GUIDE v2.5 17-Nov-2017 00:28:39
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @ourVsaGuiV3_OpeningFcn, ...
-                   'gui_OutputFcn',  @ourVsaGuiV3_OutputFcn, ...
+                   'gui_OpeningFcn', @ourVsaGuiV2_autoread_OpeningFcn, ...
+                   'gui_OutputFcn',  @ourVsaGuiV2_autoread_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -44,26 +44,26 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before ourVsaGuiV3 is made visible.
-function ourVsaGuiV3_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before ourVsaGuiV2_autoread is made visible.
+function ourVsaGuiV2_autoread_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to ourVsaGuiV3 (see VARARGIN)
+% varargin   command line arguments to ourVsaGuiV2_autoread (see VARARGIN)
 
-% Choose default command line output for ourVsaGuiV3
+% Choose default command line output for ourVsaGuiV2_autoread
 handles.output = hObject;
 
 % Update handles structure
 guidata(hObject, handles);
 
-% UIWAIT makes ourVsaGuiV3 wait for user response (see UIRESUME)
+% UIWAIT makes ourVsaGuiV2_autoread wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = ourVsaGuiV3_OutputFcn(hObject, eventdata, handles) 
+function varargout = ourVsaGuiV2_autoread_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -78,10 +78,6 @@ function [inputProcessed, avg] = prepareInputSignal(input,Fs)
     [voice ,avg] = signal_preprocess(input,Fs);
     input = input .* voice;
     input(input==0) = [];
-    
-    %normalization of input signal
-    maxIN = max(abs(input));
-    input = input ./ maxIN; 
     
     inputProcessed = input;
 
@@ -102,7 +98,7 @@ function plotSegmentedSignal(handle,input,avg,impulseCT,impulseOT)
     cla(psnxAx1);
     plot(input),axis('tight');
     hold on;
-    plot(avg);
+    %plot(avg);
     set(gca,'Yticklabel',[]) 
     set(gca,'Xticklabel',[]) 
     axes(psnxAx2);
@@ -139,14 +135,16 @@ function plotImpulseDiffs(handle,impulseCTtimeInstances,firstDifference)
     %subplot(2,1,2),plot(1:1:length(halfLine),halfLine);
     %hold on;
     subplot(2,1,2),scatter(1:1:length(firstDifference),firstDifference,sz,firstDifference,'filled'),title('Normalized GCI Diff Impulse Time Instances','FontSize',8);
-    axis([-0.2 inf 0 1.2]);
+    axis([0 inf 0 2]);
     hold on;
     meanLine(1:length(firstDifference)-1) = mean(firstDifference);
     subplot(2,1,2),plot(1:1:length(meanLine),meanLine,'r','MarkerSize',1);
 
     
     
-function jitPercentage = processAndPlot(input,Fs,handleSegmented,handleOverlay,handleImpluses,handleBoxplot)
+function jitPercentage = processAndPlot(file,handleSegmented,handleOverlay,handleImpluses,handleBoxplot)
+    [input,Fs] = audioread(file);
+
     [input,avg] = prepareInputSignal(input,Fs);
     
     [gci,goi,impulseCT,impulseOT] = generateDypsaInpulses(input,Fs);
@@ -157,7 +155,7 @@ function jitPercentage = processAndPlot(input,Fs,handleSegmented,handleOverlay,h
 
     firstDifference = abs(diff(gci));
     firstDifference = firstDifference ./ max(firstDifference);
-
+    
     plotImpulseDiffs(handleImpluses,gci,firstDifference);
     
     pnbAx1 = subplot(1,1,1,'Parent', handleBoxplot);
@@ -168,17 +166,16 @@ function jitPercentage = processAndPlot(input,Fs,handleSegmented,handleOverlay,h
 
     
     
-function jitNorm = processNormal(hObject, eventdata, handles, input,Fs)
+function jitNorm = processNormal(hObject, eventdata, handles, file)
     
-    jitNorm = processAndPlot(input,Fs,handles.panelSegmentedNormal,handles.panelSegmentedOverlayNormal,handles.panelImpulseNormal,handles.panelNormalBoxplot);
+    jitNorm = processAndPlot(file,handles.panelSegmentedNormal,handles.panelSegmentedOverlayNormal,handles.panelImpulseNormal,handles.panelNormalBoxplot);
       
 function jit = myJitter(firstDiff)
     firstDiff = firstDiff ./ max(firstDiff);
     mn = mean(firstDiff);
-    jit = (sum(abs(firstDiff - mn))/(length(firstDiff*0.5)))*100; 
+    jit = (sum(abs(firstDiff - mn))/(length(firstDiff*0.5)))*100;
     
 function jit = jitter(firstDiff)
-
     secondDiff = diff(firstDiff);
     
     N = length(firstDiff);
@@ -186,38 +183,50 @@ function jit = jitter(firstDiff)
     firstDifSum = sum(firstDiff);
     secDiffSum = sum(secondDiff);
     
-    %jit = abs(secDiffSum/(N-1))
-    jit = abs(((secDiffSum/(N-1))/(firstDifSum/N)))*100; %relative jitter 
-    
-% --- Executes on button press in pushbuttonRecAud.
-function pushbuttonRecAud_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbuttonRecAud (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+    jit = abs(((secDiffSum/(N-1))/(firstDifSum/N)))*100; %relative jitter
+        
+function processAndPlotLoop(hObject,eventdata,handles,mode,handleTable,files,path,handleJitText,handleJitBoxplot,handleMeanJit)
+	set(handleTable, 'Data', {});
 
-    sampleRate = str2double(get(handles.editSampleRate,'String'));
-    bps = str2double(get(handles.editBps,'String'));
-    recTime = str2double(get(handles.editRecTime,'String'));
+    jits = zeros(1,length(files));
 
-    recObj = audiorecorder(sampleRate, bps, 1);
-    recordblocking(recObj, recTime);
-    y = getaudiodata(recObj);
+    for n = 1:length(files)
+        word = files{n};
+        strcat(path,word);
+        
+        if strcmp(mode,'normal') == 1
+            jit = processNormal(hObject, eventdata, handles, strcat(path,word)); 
+        elseif strcmp(mode,'stressed') == 1
+            jit = processStressed(hObject, eventdata, handles, strcat(path,word));     
+        end
+            
+        jits(n) = jit;
 
-    Fs = sampleRate; 
-    input = y(:,1);
-    
-    sound(y,Fs);
-    
-	jit = processNormal(hObject, eventdata, handles, input,Fs); 
+        set(handleJitText, 'String', [num2str(round(jit,2)) '%']);
 
-	set(handles.JitText, 'String', [num2str(round(jit,2)) '%']);
-    
+        data=get(handleTable, 'data');
+        data(end+1,:)={[word ' ' num2str(round(jit,2))]}; %if data is a cell or  
+        set(handleTable, 'data', data,'ColumnWidth',{200});
+
+        pause(0.02);
+    end
+
+        pjbnAx1 = subplot(1,1,1,'Parent', handleJitBoxplot);
+        axes(pjbnAx1);
+        boxplot(jits);
+        
+        set(handleMeanJit, 'String', ['MEAN ' num2str(round(mean(jits),2)) '%']);
+        
+        
+ 
 
 
+%saved_name = strcat(name,'_fos.m');
+%dlmwrite(saved_name,fos);
 
 
-
-
+%processNormal(hObject, eventdata, handles)
+%processStressed(hObject, eventdata, handles)
 
 
 
@@ -289,10 +298,57 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in pushbuttonDypsaTestbed.
-function pushbuttonDypsaTestbed_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbuttonDypsaTestbed (see GCBO)
+    
+function jitStr = processStressed(hObject, eventdata, handles, file)
+
+	jitStr = processAndPlot(file,handles.panelSegmentedStressed,handles.panelSegmentedOverlayStressed,handles.panelImpulseStressed,handles.panelStressedBoxplot);
+
+    
+    
+% --- Executes on button press in pushbuttonNormal.
+function pushbuttonNormal_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbuttonNormal (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-run(ourVsaGuiV2_autoread)
+%folder_name=uigetdir(path);
+folder_name='NormalMale';
+files = dir(fullfile(folder_name,'*.wav'));
+files = {files.name};
+[filpath,name,ext] = fileparts(folder_name);
+audios_name = strcat(name,'/');
+
+processAndPlotLoop(hObject,eventdata,handles,'normal',handles.uitableJitNorm,files,audios_name,handles.textJitterNormal,handles.uipanelJitBoxplotNormal,handles.textMeanJitNormal);
+
+       
+
+
+% --- Executes on button press in pushbuttonStressed.
+function pushbuttonStressed_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbuttonStressed (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+%folder_name=uigetdir(path);
+folder_name='StressedMale';
+files = dir(fullfile(folder_name,'*.wav'));
+files = {files.name};
+[filpath,name,ext] = fileparts(folder_name);
+audios_name = strcat(name,'/');
+
+processAndPlotLoop(hObject,eventdata,handles,'stressed',handles.uitableStressed,files,audios_name,handles.textJitterStressed,handles.uipanelJitBoxplotStressed,handles.textMeanJitStressed);
+
+
+
+% --- Executes on button press in pushbuttonProcessData.
+function pushbuttonProcessData_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbuttonProcessData (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+pushbuttonNormal_Callback(hObject, eventdata, handles) ; 
+pushbuttonStressed_Callback(hObject, eventdata, handles);
+
+%myicon = imread('Cofee.jpeg');
+%h=msgbox('Here is you cofee!','Success','custom',myicon);
+    

@@ -17,7 +17,7 @@ function output = normalisation(signal, fs)
     %loudness = integratedLoudness(signal, fs)
     signal = signal - mean(signal);
     
-    signal = signal / max(signal);
+    signal = signal ./ max(signal);
     output = signal;
     
     
